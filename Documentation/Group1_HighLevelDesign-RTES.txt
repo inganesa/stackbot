@@ -1,0 +1,33 @@
+﻿High Level Design - Stackbot
+
+
+Group Members:
+Qi Zhiyuan
+Sanjay Mario Dmello
+Jovita Castelino
+Anitha Ganesha
+
+
+  
+
+
+
+Objective:
+The objective of the project is to pick up moving objects from a conveyor belt and stack them.
+
+
+High Level Design:
+
+
+1. Conveyor Belt : The speed of the conveyor belt system is controlled via a servo motor in association with the image processing system. A DC-DC buck converter is used in order to provide a tunable voltage to the motor. An 8051 microcontroller may be required to provide PWM signal, which will be sent to the Buck converter to tune the output voltage. In order to achieve high level DC gain and low level damping in the feedback control, we plan to use a PID control circuit between the motor and the triggering signal that comes from the imaging system. Once the camera imaging system obtains signals when the arm arrives, the main controller (ATOM) sends out  a slowed down digital signal to the 8051 microcontroller. The 8051 will do the calculation and figure out suitable PWM signal which can tune the speed of the conveyor belt to our desired value.
+2. Video Frame Processing: Video camera captures the images of the moving objects of the conveyer belt and sends this information to the bt878 frame grabber which in turn is transferred to the Vxworks system through a PCI bus. Whenever a frame is received , an interrupt  is raised which transfers the control to the driver interrupt service routine which inturn calls the video frame driver . This driver processes the inputs frames and transfers it to the centroid image processing system. 
+3. Image Processing: The micro deadline tasks considered are:
+   * Shape detection of the different moving objects on the conveyer belt. This information is used by the robotic arm to stack objects according to the detected shape( for example circular, triangular, rectangular etc).
+   * Centroid detection of the object of Interest with higher priority. Also, Identifying the speed of the moving object on the conveyer belt by continuously monitoring the position of the object in incoming video frame. This information is used to pick the moving object using the robotic arm.
+   *  Multiple centroid detection of the surrounding objects with lower priority.
+
+
+1. Robotic Arm Output: Following the centroid processing of the object of interest, the computational data is input to the Intel atom processor board via TCP/IP connection. The servo drivers for the robotic arm (FTDI - AX 12) derives support from the atom processor. The arm then captures the object corresponding to the shape detected and proceeds to place them on to their respective stacks.
+
+
+1. Windows Output: Following the multiple centroid processing, the pixel address is sent to a host machine via TCP/IP. This information is then is displayed on the console which contains the centroid of all the objects captured.
